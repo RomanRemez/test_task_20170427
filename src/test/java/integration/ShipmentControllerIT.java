@@ -5,6 +5,7 @@ import com.opinta.dto.ShipmentDto;
 import com.opinta.entity.Shipment;
 import com.opinta.mapper.ShipmentMapper;
 import com.opinta.service.ShipmentService;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -104,7 +105,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         jsonObject.put("senderId", (int) testHelper.createClient().getId());
         jsonObject.put("recipientId", (int) testHelper.createClient().getId());
         //update data before save
-        jsonObject.put("price", 45);
+        ((JSONObject)((JSONArray)jsonObject.get("parcels")).get(0)).put("price", 45);
         String expectedJson = jsonObject.toString();
 
         given().

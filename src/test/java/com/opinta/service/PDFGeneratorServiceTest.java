@@ -1,12 +1,7 @@
 package com.opinta.service;
 
-import com.opinta.entity.Address;
+import com.opinta.entity.*;
 import com.opinta.entity.Counterparty;
-import com.opinta.entity.PostcodePool;
-import com.opinta.entity.Shipment;
-import com.opinta.entity.Counterparty;
-import com.opinta.entity.Client;
-import com.opinta.entity.DeliveryType;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
@@ -18,6 +13,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -44,8 +41,13 @@ public class PDFGeneratorServiceTest {
                 new PostcodePool("00003", false));
         Client sender = new Client("FOP Ivanov", "001", senderAddress, counterparty);
         Client recipient = new Client("Petrov PP", "002", recipientAddress, counterparty);
-        shipment = new Shipment(sender, recipient, DeliveryType.W2W, 1, 1,
-                new BigDecimal("12.5"), new BigDecimal("2.5"), new BigDecimal("15.25"));
+
+        List<Parcel> parcels = new ArrayList<>();
+        Parcel parcel = new Parcel(null, 1, 1, 1, 1,
+                                    new BigDecimal("12.5"), new BigDecimal("2.5"));
+        parcels.add(parcel);
+        shipment = new Shipment(sender, recipient, DeliveryType.W2W,
+                                new BigDecimal("2.5"), new BigDecimal("15.25"), parcels);
     }
 
     @Test

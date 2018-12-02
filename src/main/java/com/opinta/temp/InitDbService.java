@@ -2,12 +2,8 @@ package com.opinta.temp;
 
 import com.opinta.dto.PostOfficeDto;
 import com.opinta.dto.ShipmentDto;
-import com.opinta.entity.Counterparty;
+import com.opinta.entity.*;
 import com.opinta.mapper.ShipmentTrackingDetailMapper;
-import com.opinta.entity.ShipmentStatus;
-import com.opinta.entity.ShipmentTrackingDetail;
-import com.opinta.entity.TariffGrid;
-import com.opinta.entity.W2wVariation;
 import com.opinta.service.ShipmentTrackingDetailService;
 import com.opinta.service.TariffGridService;
 import java.math.BigDecimal;
@@ -28,13 +24,6 @@ import com.opinta.mapper.PostOfficeMapper;
 import com.opinta.mapper.PostcodePoolMapper;
 import com.opinta.mapper.ShipmentMapper;
 import com.opinta.mapper.CounterpartyMapper;
-import com.opinta.entity.Address;
-import com.opinta.entity.BarcodeInnerNumber;
-import com.opinta.entity.Client;
-import com.opinta.entity.DeliveryType;
-import com.opinta.entity.PostOffice;
-import com.opinta.entity.PostcodePool;
-import com.opinta.entity.Shipment;
 import com.opinta.service.AddressService;
 import com.opinta.service.BarcodeInnerNumberService;
 import com.opinta.service.ClientService;
@@ -145,14 +134,20 @@ public class InitDbService {
 
         // create Shipment
         List<ShipmentDto> shipmentsSaved = new ArrayList<>();
-        Shipment shipment = new Shipment(clientsSaved.get(0), clientsSaved.get(1), DeliveryType.W2W, 1, 1,
-                new BigDecimal("12.5"), new BigDecimal("2.5"), new BigDecimal("15"));
+        Shipment shipment = createShipment(clientsSaved.get(0), clientsSaved.get(1), DeliveryType.W2W,
+                                            1, 1,1,1,
+                                            new BigDecimal("12.5"), new BigDecimal("2.5"),
+                                            new BigDecimal("15"));
         shipmentsSaved.add(shipmentService.save(shipmentMapper.toDto(shipment)));
-        shipment = new Shipment(clientsSaved.get(0), clientsSaved.get(0), DeliveryType.W2D, 2, 2,
-                new BigDecimal("19.5"), new BigDecimal("0.5"), new BigDecimal("20.5"));
+
+        shipment = createShipment(clientsSaved.get(0), clientsSaved.get(0), DeliveryType.W2D,
+                                2, 2, 2,2,
+                                new BigDecimal("19.5"), new BigDecimal("0.5"), new BigDecimal("20.5"));
         shipmentsSaved.add(shipmentService.save(shipmentMapper.toDto(shipment)));
-        shipment = new Shipment(clientsSaved.get(1), clientsSaved.get(0), DeliveryType.D2D, 3, 3,
-                new BigDecimal("8.5"), new BigDecimal("2.25"), new BigDecimal("13.5"));
+
+        shipment = createShipment(clientsSaved.get(1), clientsSaved.get(0), DeliveryType.D2D,
+                                3, 3, 3, 3,
+                                new BigDecimal("8.5"), new BigDecimal("2.25"), new BigDecimal("13.5"));
         shipmentsSaved.add(shipmentService.save(shipmentMapper.toDto(shipment)));
 
         // create PostOffice
@@ -167,6 +162,15 @@ public class InitDbService {
                 new ShipmentTrackingDetail(shipmentMapper.toEntity(shipmentsSaved.get(0)),
                         postOfficeMapper.toEntity(postOfficeSaved), ShipmentStatus.PREPARED, new Date());
         shipmentTrackingDetailService.save(shipmentTrackingDetailMapper.toDto(shipmentTrackingDetail));
+    }
+
+    private Shipment createShipment(Client sender, Client recipient, DeliveryType deliveryType,
+                                    float weight, float length, float width, float height,
+                                    BigDecimal declaredPrice, BigDecimal price, BigDecimal postPay) {
+        Parcel parcel = new Parcel(null, weight, length, width, height, declaredPrice, price);
+        List<Parcel> parcels = new ArrayList<>();
+        parcels.add(parcel);
+        return new Shipment(sender, recipient, deliveryType, price, postPay, parcels);
     }
 
     private void populateTariffGrid() {
